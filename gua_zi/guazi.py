@@ -4,6 +4,7 @@ import json
 from multiprocessing.dummy import Pool
 from bs4 import BeautifulSoup
 import pymongo
+# 写入文件时，需加上此三行代码，默认以utf8写入
 import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
