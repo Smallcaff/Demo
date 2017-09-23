@@ -20,19 +20,19 @@ class AutohomeSpider(scrapy.Spider):
         """
         抓取汽车品牌及链接
         """
-        item = AutohomeItem()
+
         brand_list = response.xpath('//dl')
         for brand in brand_list:
             # 汽车品牌
+            item = AutohomeItem()
             item['car_brand'] = brand.xpath('./dt/div/a/text()').extract()[0]
-            li_list = brand.xpath('./dd/ul/li')
-            for li in li_list:
+            a_list = brand.xpath('./dd/ul/li/h4/a')
+            for a in a_list:
                 # 汽车型号
-                item['car_type'] = li.xpath('./h4/a/text()').extract()[0]
+                item['car_type'] = a.xpath('./text()').extract()[0]
                 # 汽车链接
-                car_link = "http:" + li.xpath('./h4/a/@href').extract()[0]
+                car_link = "http:" + a.xpath('./@href').extract()[0]
                 yield scrapy.Request(url=car_link, callback=self.parse_detail, meta={'item': item})
-
 
     def parse_detail(self, response):
         """
@@ -40,6 +40,7 @@ class AutohomeSpider(scrapy.Spider):
         """
         item = response.meta['item']
         li_list = response.xpath('//div[@class="interval01 interval-new"]/ul/li')
+        # items = []
         for li in li_list:
             # 汽车详细配置
             item['car_configuration'] = li.xpath('./div[1]//p[1]/a/text()').extract()[0]
@@ -48,6 +49,7 @@ class AutohomeSpider(scrapy.Spider):
                 item['car_price'] = li.xpath('./div[3]/div/text()').extract()[0].strip()
             else:
                 item['car_price'] = li.xpath('./div[3]/div/text()').extract()[1].strip()
+            # items.append(item)
 
             yield item
 
